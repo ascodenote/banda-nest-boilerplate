@@ -3,6 +3,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -21,7 +22,7 @@ export class Role {
   @Column({ type: 'integer', default: 999 })
   rank: number;
 
-  @ManyToMany(() => User, (user) => user.roles)
+  @OneToMany(() => User, (user) => user.role)
   users?: User[];
 
   @ManyToMany(() => Permission)

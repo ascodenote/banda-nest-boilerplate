@@ -1,14 +1,13 @@
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { Role } from '../../auth/entities/role.entity';
 import { AccountStatus } from '../enums/user.enum';
-import { Permission } from 'src/modules/auth/entities/permission.entity';
 
 @Entity()
 export class User {
@@ -27,13 +26,7 @@ export class User {
   @Column({ default: AccountStatus.Inactive })
   accountStatus: AccountStatus;
 
-  @ManyToMany(() => Role, (role) => role.users)
-  @JoinTable()
-  roles?: Role[];
-
-  // Ability to also directly assign permissions to user
-  // means more flexibility with potentially more complexity
-  @ManyToMany(() => Permission)
-  @JoinTable()
-  permissions?: Permission[];
+  @ManyToOne(() => Role)
+  @JoinColumn()
+  role?: Role;
 }
