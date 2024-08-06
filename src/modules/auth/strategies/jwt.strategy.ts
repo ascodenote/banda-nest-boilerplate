@@ -18,14 +18,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    console.log(payload)
+    
     // only runs if the token is valid and successfully verified.
     // If the token is valid, the validate method is called with the decoded payload.
 
     // Optionally, you can perform additional checks here, such as checking if
     // the user exists, is banned, whatever.
     const user = await this.usersService.findOne(payload.username);
-
+    // console.log(user.role.name)
     if (!user) {
       throw new UnauthorizedException();
     }

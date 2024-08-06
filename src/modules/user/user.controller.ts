@@ -14,6 +14,8 @@ import { CreateUserInputDto } from './dto/create-user-input.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from './entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { ClientRole } from '../auth/enums/role.enum';
 
 @ApiTags('user')
 @ApiBearerAuth()
@@ -30,7 +32,7 @@ export class UserController {
   create(@Body() createUserDto: CreateUserInputDto) {
     return this.userService.create(createUserDto);
   }
-
+  @Roles(ClientRole.Admin, ClientRole.USER)
   @Get()
   findAll() {
     return this.userService.findAll();
