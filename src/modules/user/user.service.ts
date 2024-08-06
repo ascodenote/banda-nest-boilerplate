@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserInputDto } from './dto/create-user-input.dto';
+import { hashPassword } from 'src/shares/utils/encryption.util';
 
 @Injectable()
 export class UserService {
@@ -16,8 +17,8 @@ export class UserService {
   async create(createUserInputDto: CreateUserInputDto): Promise<User> {
     const { username, password, name } = createUserInputDto;
 
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await hashPassword(password)
+
     const user = this.usersRepository.create({
       username,
       password: hashedPassword,
@@ -35,8 +36,21 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(
+    username: string,
+    selectSecrets: boolean = false,
+  ): Promise<User | null> {
+    const query = this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username', { username })
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'rolePermission');
+
+    if (selectSecrets) {
+      query.addSelect('user.password');
+    }
+
+    return await query.getOne();
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

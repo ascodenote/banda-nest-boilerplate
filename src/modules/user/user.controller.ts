@@ -11,10 +11,20 @@ import { UserService } from './user.service';
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserInputDto } from './dto/create-user-input.dto';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from './entities/user.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('user')
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('profile')
+  getProfile(@CurrentUser() user: User) {
+    return user;
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserInputDto) {
@@ -26,10 +36,6 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
