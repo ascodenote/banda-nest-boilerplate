@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 
@@ -16,15 +17,28 @@ import { User } from './entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { ClientRole } from '../auth/enums/role.enum';
+import { Permissions } from '../auth/decorators/permissions.decorator';
+import { ClientPermission } from '../auth/enums/permission.enum';
+import { CaslAbilityFactory } from '../casl/casl-ability.factory';
+import { Action } from '../auth/enums/actions.enum';
 
 @ApiTags('user')
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private caslAbilityFactory: CaslAbilityFactory,
+  ) {}
 
   @Get('profile')
   getProfile(@CurrentUser() user: User) {
+    const ability = this.caslAbilityFactory.createForUser(user);
+
+    if (!ability.can(Action.Update, 'all')) {
+      throw new ForbiddenException(`Permission denied`);
+    }
+
     return user;
   }
 
@@ -32,7 +46,9 @@ export class UserController {
   create(@Body() createUserDto: CreateUserInputDto) {
     return this.userService.create(createUserDto);
   }
+
   @Roles(ClientRole.Admin, ClientRole.USER)
+  @Permissions(ClientPermission.CreateAnnouncement)
   @Get()
   findAll() {
     return this.userService.findAll();
