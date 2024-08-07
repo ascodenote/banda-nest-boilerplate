@@ -4,16 +4,18 @@ import appConfig from 'src/configs/app.config';
 import dbConfig from 'src/configs/db.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'path';
+import authConfig from 'src/configs/auth.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, dbConfig],
+      load: [appConfig, dbConfig, authConfig],
       envFilePath: ['.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       useFactory: (configService: ConfigService) => ({
         // type: 'mysql',
         // host: configService.get<string>('db.host'),
