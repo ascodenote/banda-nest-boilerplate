@@ -6,7 +6,7 @@ import { User } from './entities/user.entity';
 import { CaslModule } from '../casl/casl.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]),CaslModule],
+  imports: [TypeOrmModule.forFeature([User]), CaslModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

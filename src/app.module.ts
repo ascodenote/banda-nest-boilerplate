@@ -9,7 +9,7 @@ import { CaslModule } from './modules/casl/casl.module';
 import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
 
 @Module({
-  imports: [AuthModule, UserModule, SharedModule,CaslModule],
+  imports: [AuthModule, UserModule, SharedModule, CaslModule],
   providers: [
     {
       provide: APP_GUARD,
@@ -23,7 +23,6 @@ import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
       provide: APP_GUARD,
       useClass: PermissionsGuard,
     },
-
   ],
 })
 export class AppModule {}
