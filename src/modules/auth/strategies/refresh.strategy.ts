@@ -24,23 +24,22 @@ export class JwtRefreshStrategy extends PassportStrategy(
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           // eslint-disable-next-line prettier/prettier
-          return request?.cookies?.['RefreshToken'];
+          return request?.cookies?.['refreshToken'];
         },
       ]),
     });
   }
 
   async validate(request: Request, payload: any) {
+    console.log('Hiiiii on refersh strategy', payload);
+
     if (!payload) {
       throw new BadRequestException('invalid jwt token');
     }
-    const data = request?.cookies['RefreshToken'];
-    if (!data) {
-      throw new BadRequestException('invalid refresh token');
-    }
-    const getUser = await this.usersService.findOneByID(data.sub);
-    console.log(getUser);
-    // const isValidToken = await AuthHelpers.verify(token, getUser.hashToken);
-    return payload;
+
+    // const getUser = await this.usersService.findOneByID(payload.sub);
+
+    // return getUser;
+    return true;
   }
 }

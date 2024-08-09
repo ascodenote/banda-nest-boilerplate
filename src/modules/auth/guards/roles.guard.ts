@@ -15,15 +15,16 @@ export class RolesGuard implements CanActivate {
     const requiredClientRoles = this.reflector.getAllAndOverride<
       ClientRole[] | undefined
     >(ROLES_METEDATA_KEY, [context.getHandler(), context.getClass()]);
-    console.log('nyasar 2', requiredClientRoles);
+
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
+
     if (isPublic) {
       return true;
     }
-    console.log('nyasar hasil');
+
     if (!requiredClientRoles || requiredClientRoles.length === 0) {
       return true;
     }

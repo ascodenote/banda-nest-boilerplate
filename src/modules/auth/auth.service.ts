@@ -51,31 +51,23 @@ export class AuthService {
     };
   }
 
-  async validateRefreshToken(sub, token): Promise<any> {
+  async validateRefreshToken(sub: any): Promise<any> {
     const getUser = await this.usersService.findOneByID(sub);
-
+    console.log(getUser);
     // const isValidToken = await AuthHelpers.verify(token, getUser.hashToken);
-
     // // const isValidToken = await bcrypt.compare(token, user.hashToken);
     // // console.log(isValidToken);
-
     // if (!isValidToken) {
     //   throw new HttpException('Token Expired', HttpStatus.UNAUTHORIZED);
     // }
-
-    // const payload = {
-    //   sub: getUser.id,
-    //   firstName: getUser.firstName,
-    //   lastName: getUser.lastName,
-    //   email: getUser.email,
-    //   role: getUser.role,
-    // };
-
-    // const tokens = await this.getJwtToken(payload);
-
-    // return {
-    //   accessToken: tokens.accessToken,
-    // };
+    const payload = {
+      sub: getUser.id,
+      role: getUser.role,
+    };
+    const tokens = await this.getJwtToken(payload);
+    return {
+      refreshToken: tokens.refreshToken,
+    };
   }
 
   async getJwtToken(user: any) {
