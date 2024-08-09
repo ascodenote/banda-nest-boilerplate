@@ -52,6 +52,23 @@ export class UserService {
     return await query.getOne();
   }
 
+  async findOneByID(
+    id: number,
+    selectSecrets: boolean = false,
+  ): Promise<User | null> {
+    const query = this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username', { id })
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'rolePermission');
+
+    if (selectSecrets) {
+      query.addSelect('user.password');
+    }
+
+    return await query.getOne();
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     console.log(updateUserDto);
     return `This action updates a #${id} user`;

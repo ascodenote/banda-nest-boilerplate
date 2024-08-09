@@ -1,10 +1,21 @@
-import { Controller, Post, Body, UseGuards, Res, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Res,
+  Req,
+  Get,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserInputDto } from '../user/dto/create-user-input.dto';
 import { LoginInputDto } from './dto/login-input.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decorator';
+import { JwtRefreshGuard } from './guards/refresh-auth.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -14,6 +25,7 @@ export class AuthController {
   @Public()
   @Post('/register')
   async create(@Body() createAuthDto: CreateUserInputDto) {
+    console.log('HIIIIIT');
     return await this.authService.create(createAuthDto);
   }
 
@@ -39,5 +51,20 @@ export class AuthController {
       data: loginResult.data,
       message: 'Login successful',
     });
+  }
+
+  @Get('refresh')
+  @UseGuards(JwtRefreshGuard)
+  @ApiOperation({ description: 'Refresh Token' })
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Req() req, @Res() res) {
+    // const user = req.user;
+    // const token = await this.authService.validateRefreshToken(
+    //   user.sub,
+    //   req.cookies['RefreshToken'],
+    // );
+
+    // return res.send({ accessToken: token.accessToken });
+    return true;
   }
 }

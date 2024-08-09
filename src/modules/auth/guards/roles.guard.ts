@@ -4,17 +4,26 @@ import { Observable } from 'rxjs';
 import { User } from '../../user/entities/user.entity';
 import { ROLES_METEDATA_KEY } from '../decorators/roles.decorator';
 import { ClientRole } from '../enums/role.enum';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private refector: Reflector) {}
+  constructor(private reflector: Reflector) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const requiredClientRoles = this.refector.getAllAndOverride<
+    const requiredClientRoles = this.reflector.getAllAndOverride<
       ClientRole[] | undefined
     >(ROLES_METEDATA_KEY, [context.getHandler(), context.getClass()]);
-
+    console.log('nyasar 2', requiredClientRoles);
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) {
+      return true;
+    }
+    console.log('nyasar hasil');
     if (!requiredClientRoles || requiredClientRoles.length === 0) {
       return true;
     }

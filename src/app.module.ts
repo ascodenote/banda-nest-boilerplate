@@ -7,6 +7,7 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { CaslModule } from './modules/casl/casl.module';
 import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
+import { JwtRefreshGuard } from './modules/auth/guards/refresh-auth.guard';
 
 @Module({
   imports: [AuthModule, UserModule, SharedModule, CaslModule],
@@ -22,6 +23,10 @@ import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
     {
       provide: APP_GUARD,
       useClass: PermissionsGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtRefreshGuard,
     },
   ],
 })
