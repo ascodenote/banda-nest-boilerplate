@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserInputDto } from '../user/dto/create-user-input.dto';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
@@ -52,20 +52,25 @@ export class AuthService {
   }
 
   async validateRefreshToken(sub: any): Promise<any> {
+    console.log(sub);
     const getUser = await this.usersService.findOneByID(sub);
-    console.log(getUser);
+    // console.log(getUser);
     // const isValidToken = await AuthHelpers.verify(token, getUser.hashToken);
     // // const isValidToken = await bcrypt.compare(token, user.hashToken);
     // // console.log(isValidToken);
-    // if (!isValidToken) {
-    //   throw new HttpException('Token Expired', HttpStatus.UNAUTHORIZED);
-    // }
+    if (!getUser) {
+      throw new HttpException('Token Expired', HttpStatus.UNAUTHORIZED);
+    }
+
     const payload = {
       sub: getUser.id,
       role: getUser.role,
     };
     const tokens = await this.getJwtToken(payload);
+
     return {
+      data: payload,
+      accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
   }

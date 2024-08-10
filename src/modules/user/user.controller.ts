@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 
@@ -20,7 +19,6 @@ import { ClientRole } from '../auth/enums/role.enum';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { ClientPermission } from '../auth/enums/permission.enum';
 import { CaslAbilityFactory } from '../casl/casl-ability.factory';
-import { Action } from '../auth/enums/actions.enum';
 
 @ApiTags('user')
 @ApiBearerAuth()
@@ -33,12 +31,6 @@ export class UserController {
 
   @Get('profile')
   getProfile(@CurrentUser() user: User) {
-    const ability = this.caslAbilityFactory.createForUser(user);
-
-    if (!ability.can(Action.Update, 'all')) {
-      throw new ForbiddenException(`Permission denied`);
-    }
-
     return user;
   }
 

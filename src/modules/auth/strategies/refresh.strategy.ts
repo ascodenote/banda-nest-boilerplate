@@ -31,15 +31,13 @@ export class JwtRefreshStrategy extends PassportStrategy(
   }
 
   async validate(request: Request, payload: any) {
-    console.log('Hiiiii on refersh strategy', payload);
-
     if (!payload) {
       throw new BadRequestException('invalid jwt token');
     }
 
-    // const getUser = await this.usersService.findOneByID(payload.sub);
+    const getUser = await this.usersService.findOneByID(payload.sub);
 
-    // return getUser;
-    return true;
+    return getUser;
+    // return true;
   }
 }

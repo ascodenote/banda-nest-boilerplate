@@ -6,8 +6,6 @@ import {
   Res,
   Req,
   Get,
-  HttpCode,
-  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -57,22 +55,21 @@ export class AuthController {
   @ApiOperation({ description: 'Refresh Token' })
   // @HttpCode(HttpStatus.OK)
   async refresh(@Req() req, @Res() res) {
-    console.log('dsadsadsad', req.user);
-
     const user = req.user;
-    const token = await this.authService.validateRefreshToken(user.sub);
+    const token = await this.authService.validateRefreshToken(user.id);
 
-    // return res.send({ accessToken: token.accessToken });
-    // res.cookie('refreshToken', token.refreshToken, {
+    // res.cookie('accessToken', token.accessToken, {
     //   httpOnly: true,
     //   secure: process.env.NODE_ENV === 'production',
     //   sameSite: 'strict',
     // });
+
     res.cookie('refreshToken', token.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
     });
+
     return res.send({ accessToken: token.accessToken });
   }
 }
