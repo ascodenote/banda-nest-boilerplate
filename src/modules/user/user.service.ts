@@ -14,7 +14,7 @@ export class UserService {
   ) {}
 
   async create(createUserInputDto: CreateUserInputDto): Promise<User> {
-    const { username, password, name } = createUserInputDto;
+    const { username, password, name, email } = createUserInputDto;
 
     const hashedPassword = await hashPassword(password);
 
@@ -22,6 +22,7 @@ export class UserService {
       username,
       password: hashedPassword,
       name,
+      email,
     });
 
     const newUser = await this.usersRepository.save(user);

@@ -23,6 +23,9 @@ export class User {
   @Column({ nullable: true })
   name?: string;
 
+  @Column({ nullable: true })
+  email?: string;
+
   @Column({ default: AccountStatus.Inactive })
   accountStatus: AccountStatus;
 

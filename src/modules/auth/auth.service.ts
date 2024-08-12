@@ -6,6 +6,7 @@ import { LoginInputDto } from './dto/login-input.dto';
 import { comparePassword } from 'src/shares/utils/encryption.util';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -13,10 +14,17 @@ export class AuthService {
     private usersService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private mailService: MailService,
   ) {}
 
   async create(createAuthDto: CreateUserInputDto): Promise<User> {
-    return await this.usersService.create(createAuthDto);
+    const user = await this.usersService.create(createAuthDto);
+
+    // Kirim email konfirmasi setelah pengguna berhasil dibuat
+    const token = 'generated_token'; // Ganti dengan logika untuk menghasilkan token
+    await this.mailService.sendUserConfirmation(user, token);
+
+    return user;
   }
 
   async validateUser({ username, password }: LoginInputDto) {
