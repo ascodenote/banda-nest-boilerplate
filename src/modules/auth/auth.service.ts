@@ -21,9 +21,15 @@ export class AuthService {
     const user = await this.usersService.create(createAuthDto);
 
     // Kirim email konfirmasi setelah pengguna berhasil dibuat
-    const token = 'generated_token'; // Ganti dengan logika untuk menghasilkan token
-    await this.mailService.sendUserConfirmation(user, token);
-
+    // const token = 'generated_token'; // Ganti dengan logika untuk menghasilkan token
+    // await this.mailService.sendUserConfirmation(user, token);
+    const email = {
+      to: user.email,
+      subject: 'Selamat Datang di FUA Academy!',
+      text: 'Terima kasih telah mendaftar. Silakan cek email Anda untuk konfirmasi pendaftaran.',
+    };
+    console.log('huuu');
+    await this.mailService.sendMailSandBox(email);
     return user;
   }
 

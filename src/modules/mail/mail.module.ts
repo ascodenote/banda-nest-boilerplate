@@ -3,8 +3,8 @@ import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-
+// import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 @Module({
   imports: [
     MailerModule.forRootAsync({
@@ -26,7 +26,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
         },
         template: {
           dir: join(__dirname, 'templates'),
-          adapter: new HandlebarsAdapter(),
+          // adapter: new HandlebarsAdapter(),
+          adapter: new PugAdapter({ inlineCssEnabled: true }),
           options: {
             strict: true,
           },
