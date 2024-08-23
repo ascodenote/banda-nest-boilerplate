@@ -23,8 +23,21 @@ export type DataBaseConfig = {
   database: string;
 };
 
+export type MailConfig = {
+  port: number;
+  host?: string;
+  user?: string;
+  password?: string;
+  defaultEmail?: string;
+  defaultName?: string;
+  ignoreTLS: boolean;
+  secure: boolean;
+  requireTLS: boolean;
+};
+
 export type AllConfigType = {
   app: AppConfig;
   auth: AuthConfig;
   db: DataBaseConfig;
+  mail: MailConfig;
 };

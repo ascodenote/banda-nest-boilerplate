@@ -8,9 +8,10 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { CaslModule } from './modules/casl/casl.module';
 import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
 import { JwtRefreshGuard } from './modules/auth/guards/refresh-auth.guard';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
-  imports: [AuthModule, UserModule, SharedModule, CaslModule],
+  imports: [AuthModule, UserModule, SharedModule, CaslModule, MailModule],
   providers: [
     {
       provide: APP_GUARD,

@@ -13,4 +13,8 @@ export class CreateUserInputDto {
   @ApiProperty({ example: 'Jhon Doe' })
   @IsString()
   name: string;
+
+  @ApiProperty({ example: 'test@mail.com' })
+  @IsString()
+  email: string;
 }
