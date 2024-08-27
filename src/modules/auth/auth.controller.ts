@@ -6,6 +6,8 @@ import {
   Res,
   Req,
   Get,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -15,6 +17,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { JwtRefreshGuard } from './guards/refresh-auth.guard';
 import { Refresh } from './decorators/refresh.decorator';
+import { ConfirmInputDto } from './dto/confirm-input.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -45,6 +48,7 @@ export class AuthController {
 
     res.json({
       data: loginResult.data,
+      accessToken: loginResult.accessToken,
       message: 'Login successful',
     });
   }
@@ -71,5 +75,11 @@ export class AuthController {
     });
 
     return res.send({ accessToken: token.accessToken });
+  }
+
+  @Post('email/confirm')
+  @HttpCode(HttpStatus.OK)
+  async confirmEmail(@Body() confirmEmailDto: ConfirmInputDto): Promise<void> {
+    return this.authService.confirmEmail(confirmEmailDto.hash);
   }
 }

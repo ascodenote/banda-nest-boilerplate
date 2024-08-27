@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateUserInputDto } from '../user/dto/create-user-input.dto';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
@@ -7,6 +13,7 @@ import { comparePassword } from 'src/shares/utils/encryption.util';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
+import { AccountStatus } from '../user/enums/user.enum';
 
 @Injectable()
 export class AuthService {
@@ -20,11 +27,21 @@ export class AuthService {
   async create(createAuthDto: CreateUserInputDto): Promise<User> {
     const user = await this.usersService.create(createAuthDto);
 
-    // Kirim email konfirmasi setelah pengguna berhasil dibuat
-    // const token = 'generated_token'; // Ganti dengan logika untuk menghasilkan token
-    // await this.mailService.sendUserConfirmation(user, token);
-
-    await this.mailService.sendUserConfirmation(user, 'asas');
+    const hash = await this.jwtService.signAsync(
+      {
+        confirmEmailUserId: user.id,
+      },
+      {
+        secret: this.configService.getOrThrow('auth.confirm', {
+          infer: true,
+        }),
+        expiresIn: this.configService.getOrThrow('auth.confirm_exp', {
+          infer: true,
+        }),
+      },
+    );
+    console.log(hash);
+    await this.mailService.sendUserConfirmation(user, hash);
     return user;
   }
 
@@ -58,6 +75,42 @@ export class AuthService {
       accessToken: token.accessToken,
       refreshToken: token.refreshToken,
     };
+  }
+
+  async confirmEmail(hash: string): Promise<void> {
+    let userId: User['id'];
+
+    try {
+      const jwtData = await this.jwtService.verifyAsync<{
+        confirmEmailUserId: User['id'];
+      }>(hash, {
+        secret: this.configService.getOrThrow('auth.confirm', {
+          infer: true,
+        }),
+      });
+
+      userId = jwtData.confirmEmailUserId;
+    } catch {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          hash: `invalidHash`,
+        },
+      });
+    }
+
+    const user = await this.usersService.findOneByID(userId);
+
+    if (!user || user?.accountStatus !== AccountStatus.Inactive) {
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: `notFound`,
+      });
+    }
+
+    user.accountStatus = AccountStatus.Active;
+
+    await this.usersService.update(user.id, user);
   }
 
   async validateRefreshToken(sub: any): Promise<any> {

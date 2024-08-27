@@ -63,9 +63,23 @@ export class UserService {
     return await query.getOne();
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
+    const query = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id });
+
+    const user = await query.getOne();
+
+    if (!user) {
+      return null; // atau throw new NotFoundException('User not found');
+    }
+
+    Object.assign(user, updateUserDto);
+
+    const updatedUser = await this.usersRepository.save(user);
+
+    delete (updatedUser as Partial<User>).password;
+    return updatedUser;
   }
 
   remove(id: number) {

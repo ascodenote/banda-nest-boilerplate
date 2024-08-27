@@ -5,12 +5,13 @@ import dbConfig from 'src/configs/db.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as path from 'path';
 import authConfig from 'src/configs/auth.config';
+import mailConfig from 'src/configs/mail.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, dbConfig, authConfig],
+      load: [appConfig, dbConfig, authConfig, mailConfig],
       envFilePath: ['.env'],
     }),
     TypeOrmModule.forRootAsync({
