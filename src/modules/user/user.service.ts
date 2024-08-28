@@ -63,6 +63,16 @@ export class UserService {
     return await query.getOne();
   }
 
+  async findOneByEmail(email: string): Promise<User | null> {
+    const query = this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email })
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'rolePermission');
+
+    return await query.getOne();
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
     const query = await this.usersRepository
       .createQueryBuilder('user')
