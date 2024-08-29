@@ -41,7 +41,14 @@ export class AuthService {
       },
     );
     console.log(hash);
-    await this.mailService.sendUserConfirmation(user, hash);
+    // await this.mailService.sendUserConfirmation(user, hash);
+    await this.mailService.userSignUp({
+      to: createAuthDto.email,
+      data: {
+        hash,
+      },
+    });
+
     return user;
   }
 

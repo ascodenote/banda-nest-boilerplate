@@ -1,46 +1,48 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { User } from '../user/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+
 import * as path from 'path';
-import { readFileSync } from 'fs';
+import { AllConfigType } from 'src/configs/config.type';
+import { MailerService } from 'src/shares/modules/mailer/mailer.service';
+import { MailData } from './mail-data.interface';
+
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService<AllConfigType>,
+  ) {}
 
-  async sendUserConfirmation(user: User, token: string) {
-    const url = `https://www.fatihua.com/auth/confirm?token=${token}`;
-    const fileImg = path.join(__dirname, '/templates/FUA_logo.png');
-    const imageData = readFileSync(fileImg).toString('base64');
-    try {
-      await this.mailerService.sendMail({
-        to: user.email,
-        // from: '"Support Team" <support@example.com>', // override default from
-        subject: 'Welcome to FUA Academy! Confirm your Email',
-        template: './confirmation', // `.hbs` extension is appended automatically
-        context: {
-          // ✏️ filling curly brackets with content
-          name: user.name,
-          url,
-          imageUrl: imageData,
-        },
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  async userSignUp(mailData: MailData<{ hash: string }>): Promise<void> {
+    let emailConfirmTitle: 'Hahahahiiihu';
 
-  async sendUserResetPassword(user: User, token: string) {
-    const url = `https://www.fatihua.com/auth/confirm?token=${token}`;
+    const url = new URL(
+      this.configService.getOrThrow('app.frontendDomain', {
+        infer: true,
+      }) + '/confirm-email',
+    );
+    url.searchParams.set('hash', mailData.data.hash);
 
     await this.mailerService.sendMail({
-      to: user.email,
-      from: '"Support Team" <support@example.com>', // override default from
-      subject: 'Reset Password',
-      template: './confirmation', // `.hbs` extension is appended automatically
+      to: mailData.to,
+      subject: emailConfirmTitle,
+      text: `${url.toString()} ${emailConfirmTitle}`,
+      templatePath: path.join(
+        // this.configService.getOrThrow('app.workingDirectory', {
+        //   infer: true,
+        // }),
+        'src',
+        'modules',
+        'mail',
+        'templates',
+        'confirmation.hbs',
+      ),
       context: {
-        // ✏️ filling curly brackets with content
-        name: user.name,
-        url,
+        title: emailConfirmTitle,
+        url: url.toString(),
+        actionTitle: emailConfirmTitle,
+        app_name: this.configService.get('app.name', { infer: true }),
+        name: this.configService.get('app.name', { infer: true }),
       },
     });
   }
