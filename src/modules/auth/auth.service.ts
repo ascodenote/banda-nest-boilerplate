@@ -14,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
 import { AccountStatus } from '../user/enums/user.enum';
+import * as ms from 'ms';
 
 @Injectable()
 export class AuthService {
@@ -32,16 +33,15 @@ export class AuthService {
         confirmEmailUserId: user.id,
       },
       {
-        secret: this.configService.getOrThrow('auth.confirm', {
+        secret: this.configService.getOrThrow('auth.confirmEmailSecret', {
           infer: true,
         }),
-        expiresIn: this.configService.getOrThrow('auth.confirm_exp', {
+        expiresIn: this.configService.getOrThrow('auth.confirmEmailExpires', {
           infer: true,
         }),
       },
     );
-    console.log(hash);
-    // await this.mailService.sendUserConfirmation(user, hash);
+
     await this.mailService.userSignUp({
       to: createAuthDto.email,
       data: {
@@ -52,8 +52,9 @@ export class AuthService {
     return user;
   }
 
-  async validateUser({ username, password }: LoginInputDto) {
-    const user = await this.usersService.findOne(username, true);
+  async validateUser({ email, password }: LoginInputDto) {
+    const user = await this.usersService.findOne(email, true);
+    console.log(user);
     if (!user) {
       return null;
     }
@@ -79,7 +80,7 @@ export class AuthService {
 
   async login(user: any) {
     // console.log(user);
-    const payload = { username: user.username, sub: user.id };
+    const payload = { email: user.email, sub: user.id };
 
     const token = await this.getJwtToken(payload);
     return {
@@ -96,12 +97,88 @@ export class AuthService {
       const jwtData = await this.jwtService.verifyAsync<{
         confirmEmailUserId: User['id'];
       }>(hash, {
-        secret: this.configService.getOrThrow('auth.confirm', {
+        secret: this.configService.getOrThrow('auth.confirmEmailSecret', {
           infer: true,
         }),
       });
 
       userId = jwtData.confirmEmailUserId;
+      console.log(userId);
+    } catch {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          hash: `invalidHash`,
+        },
+      });
+    }
+
+    const user = await this.usersService.findOneByID(userId);
+    console.log(user);
+    if (!user || user?.accountStatus !== AccountStatus.Inactive) {
+      throw new NotFoundException({
+        status: HttpStatus.NOT_FOUND,
+        error: `notFound`,
+      });
+    }
+
+    user.accountStatus = AccountStatus.Active;
+
+    await this.usersService.update(user.id, user);
+  }
+
+  async forgetPassword(email: string): Promise<void> {
+    const user = await this.usersService.findOneByEmail(email);
+
+    if (!user) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          email: 'emailNotExists',
+        },
+      });
+    }
+
+    const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {
+      infer: true,
+    });
+    const tokenExpires = Date.now() + ms(tokenExpiresIn);
+    console.log(tokenExpires);
+
+    const hash = await this.jwtService.signAsync(
+      {
+        forgotUserId: user.id,
+      },
+      {
+        secret: this.configService.getOrThrow('auth.forgotSecret', {
+          infer: true,
+        }),
+        expiresIn: tokenExpiresIn,
+      },
+    );
+
+    await this.mailService.forgotPassword({
+      to: email,
+      data: {
+        hash,
+        tokenExpires,
+      },
+    });
+  }
+
+  async resetPassword(hash: string, password: string): Promise<void> {
+    let userId: User['id'];
+
+    try {
+      const jwtData = await this.jwtService.verifyAsync<{
+        forgotUserId: User['id'];
+      }>(hash, {
+        secret: this.configService.getOrThrow('auth.forgotSecret', {
+          infer: true,
+        }),
+      });
+
+      userId = jwtData.forgotUserId;
     } catch {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -113,14 +190,16 @@ export class AuthService {
 
     const user = await this.usersService.findOneByID(userId);
 
-    if (!user || user?.accountStatus !== AccountStatus.Inactive) {
-      throw new NotFoundException({
-        status: HttpStatus.NOT_FOUND,
-        error: `notFound`,
+    if (!user) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          hash: `notFound`,
+        },
       });
     }
 
-    user.accountStatus = AccountStatus.Active;
+    user.password = password;
 
     await this.usersService.update(user.id, user);
   }
@@ -150,6 +229,7 @@ export class AuthService {
   }
 
   async getJwtToken(user: any) {
+    console.log(this.configService.get('auth.refreshExpires'));
     const payload = {
       ...user,
     };
@@ -157,7 +237,7 @@ export class AuthService {
       this.jwtService.sign(payload),
       this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
-        expiresIn: this.configService.get('auth.refresh_exp'),
+        expiresIn: this.configService.get('auth.refreshExpires'),
       }),
     ]);
     return {

@@ -11,11 +11,12 @@ export type AppConfig = {
 export type AuthConfig = {
   secret?: string;
   expires?: string;
-  refresh_exp?: string;
-  forgot?: string;
-  forget_exp?: string;
-  confirm?: string;
-  confirm_exp?: string;
+  refreshSecret?: string;
+  refreshExpires?: string;
+  forgotSecret?: string;
+  forgotExpires?: string;
+  confirmEmailSecret?: string;
+  confirmEmailExpires?: string;
 };
 
 export type DataBaseConfig = {

@@ -18,6 +18,8 @@ import { Public } from './decorators/public.decorator';
 import { JwtRefreshGuard } from './guards/refresh-auth.guard';
 import { Refresh } from './decorators/refresh.decorator';
 import { ConfirmInputDto } from './dto/confirm-input.dto';
+import { ForgetPasswordInputDto } from './dto/forget-password-input.dto';
+import { ResetPasswordInputDto } from './dto/reset-password-input.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -81,5 +83,24 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async confirmEmail(@Body() confirmEmailDto: ConfirmInputDto): Promise<void> {
     return this.authService.confirmEmail(confirmEmailDto.hash);
+  }
+
+  @Post('forgot/password')
+  @HttpCode(HttpStatus.OK)
+  async forgetPassword(
+    @Body() forgetPasswordInputDto: ForgetPasswordInputDto,
+  ): Promise<void> {
+    return this.authService.forgetPassword(forgetPasswordInputDto.email);
+  }
+
+  @Post('reset/password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  resetPassword(
+    @Body() resetPasswordDto: ResetPasswordInputDto,
+  ): Promise<void> {
+    return this.authService.resetPassword(
+      resetPasswordDto.hash,
+      resetPasswordDto.password,
+    );
   }
 }

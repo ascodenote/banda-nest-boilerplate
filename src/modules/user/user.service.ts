@@ -14,12 +14,11 @@ export class UserService {
   ) {}
 
   async create(createUserInputDto: CreateUserInputDto): Promise<User> {
-    const { username, password, name, email } = createUserInputDto;
+    const { password, name, email } = createUserInputDto;
 
     const hashedPassword = await hashPassword(password);
 
     const user = this.usersRepository.create({
-      username,
       password: hashedPassword,
       name,
       email,
@@ -37,19 +36,18 @@ export class UserService {
   }
 
   async findOne(
-    username: string,
+    email: string,
     selectSecrets: boolean = false,
   ): Promise<User | null> {
     const query = this.usersRepository
       .createQueryBuilder('user')
-      .where('user.username = :username', { username })
+      .where('user.email = :email', { email })
       .leftJoinAndSelect('user.role', 'role')
       .leftJoinAndSelect('role.permissions', 'rolePermission');
 
     if (selectSecrets) {
       query.addSelect('user.password');
     }
-
     return await query.getOne();
   }
 

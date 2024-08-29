@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import fs from 'node:fs/promises';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs = require('fs/promises');
 import * as nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
 import { AllConfigType } from 'src/configs/config.type';
@@ -32,7 +33,6 @@ export class MailerService {
   }): Promise<void> {
     let html: string | undefined;
     if (templatePath) {
-      console.log('Template Path:', templatePath);
       const template = await fs.readFile(templatePath, 'utf-8');
       html = Handlebars.compile(template, {
         strict: true,
