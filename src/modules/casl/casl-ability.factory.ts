@@ -8,7 +8,7 @@ import {
 
 import { Injectable } from '@nestjs/common';
 import { Action } from '../auth/enums/actions.enum';
-import { ClientRole } from '../auth/enums/role.enum';
+import { ClientRole } from '../role/role.enum';
 import { User } from '../user/entities/user.entity';
 import { userHasAnyRole } from '../auth/helpers/auth.helpers';
 

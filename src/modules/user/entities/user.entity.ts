@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Role } from '../../auth/entities/role.entity';
+import { Role } from '../../role/entities/role.entity';
 import { AccountStatus } from '../enums/user.enum';
 
 @Entity()

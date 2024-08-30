@@ -60,9 +60,9 @@ export class AuthService {
     }
 
     // Cek apakah user aktif
-    if (user.accountStatus !== AccountStatus.Active) {
-      return null;
-    }
+    // if (user.accountStatus !== AccountStatus.Active) {
+    //   return null;
+    // }
 
     try {
       const isMatch = await comparePassword(password, user.password);

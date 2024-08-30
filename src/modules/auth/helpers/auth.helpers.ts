@@ -1,5 +1,5 @@
 import { User } from 'src/modules/user/entities/user.entity';
-import { ClientRole } from '../enums/role.enum';
+import { ClientRole } from '../../role/role.enum';
 
 export function getClientPermissions(user: Partial<User>): Set<string> {
   // Extract all permissions from the user's roles

@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { User } from '../../user/entities/user.entity';
 import { ROLES_METEDATA_KEY } from '../decorators/roles.decorator';
-import { ClientRole } from '../enums/role.enum';
+import { ClientRole } from '../../role/role.enum';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()

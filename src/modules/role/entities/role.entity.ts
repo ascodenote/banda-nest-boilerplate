@@ -7,9 +7,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Permission } from './permission.entity';
+import { Permission } from '../../permission/entities/permission.entity';
 import { User } from 'src/modules/user/entities/user.entity';
-import { ClientRole } from '../enums/role.enum';
+import { ClientRole } from '../role.enum';
 
 @Entity()
 export class Role {

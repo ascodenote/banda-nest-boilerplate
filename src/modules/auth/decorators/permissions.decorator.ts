@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { ClientPermission } from '../enums/permission.enum';
+import { ClientPermission } from '../../permission/permission.enum';
 
 export const PERMISSIONS_METEDATA_KEY = 'permissions_decorator_key';
 

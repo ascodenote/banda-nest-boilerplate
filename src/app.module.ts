@@ -10,6 +10,8 @@ import { JwtRefreshGuard } from './modules/auth/guards/refresh-auth.guard';
 import { MailModule } from './modules/mail/mail.module';
 import { MailerModule } from './shares/modules/mailer/mailer.module';
 import { SharedModule } from './shares/modules/shared.module';
+import { PermissionModule } from './modules/permission/permission.module';
+import { RoleModule } from './modules/role/role.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { SharedModule } from './shares/modules/shared.module';
     CaslModule,
     MailModule,
     MailerModule,
+    PermissionModule,
+    RoleModule,
   ],
   providers: [
     {

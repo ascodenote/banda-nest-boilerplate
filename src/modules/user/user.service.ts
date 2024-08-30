@@ -82,6 +82,12 @@ export class UserService {
       return null; // atau throw new NotFoundException('User not found');
     }
 
+    // Tambahkan pengecekan untuk password
+    if (updateUserDto.password) {
+      const hashedPassword = await hashPassword(updateUserDto.password);
+      updateUserDto.password = hashedPassword;
+    }
+
     Object.assign(user, updateUserDto);
 
     const updatedUser = await this.usersRepository.save(user);

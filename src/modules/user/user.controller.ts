@@ -15,9 +15,9 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from './entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { ClientRole } from '../auth/enums/role.enum';
+import { ClientRole } from '../role/role.enum';
 import { Permissions } from '../auth/decorators/permissions.decorator';
-import { ClientPermission } from '../auth/enums/permission.enum';
+import { ClientPermission } from '../permission/permission.enum';
 import { CaslAbilityFactory } from '../casl/casl-ability.factory';
 
 @ApiTags('user')
@@ -39,8 +39,8 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Roles(ClientRole.Admin, ClientRole.USER)
-  @Permissions(ClientPermission.CreateAnnouncement)
+  // @Roles(ClientRole.ADMIN, ClientRole.USER)
+  // @Permissions(ClientPermission.CreateAnnouncement)
   @Get()
   findAll() {
     return this.userService.findAll();
