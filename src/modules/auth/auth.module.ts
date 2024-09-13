@@ -8,11 +8,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtRefreshStrategy } from './strategies/refresh.strategy';
+import { JwtRefreshStrategyV1 } from './strategies/refresh-v1.strategy';
 import { MailModule } from '../mail/mail.module';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy,JwtRefreshStrategyV1],
   imports: [
     PassportModule,
     JwtModule.registerAsync({

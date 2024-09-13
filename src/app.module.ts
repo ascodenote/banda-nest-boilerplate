@@ -7,6 +7,7 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { CaslModule } from './modules/casl/casl.module';
 import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
 import { JwtRefreshGuard } from './modules/auth/guards/refresh-auth.guard';
+import { JwtRefreshV1Guard } from './modules/auth/guards/refresh-auth-v1.guard';
 import { MailModule } from './modules/mail/mail.module';
 import { MailerModule } from './shares/modules/mailer/mailer.module';
 import { SharedModule } from './shares/modules/shared.module';
@@ -33,10 +34,15 @@ import { SharedModule } from './shares/modules/shared.module';
       provide: APP_GUARD,
       useClass: PermissionsGuard,
     },
-    {
-      provide: APP_GUARD,
-      useClass: JwtRefreshGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtRefreshGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtRefreshV1Guard,
+    // },
+    
   ],
 })
 export class AppModule {}

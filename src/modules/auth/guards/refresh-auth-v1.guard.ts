@@ -5,7 +5,7 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { IS_REFRESH_KEY } from '../decorators/refresh.decorator';
 
 @Injectable()
-export class JwtRefreshGuard extends AuthGuard('jwt-refresh-token') {
+export class JwtRefreshV1Guard extends AuthGuard('jwt-refresh-token-v1') {
   constructor(private reflector: Reflector) {
     super();
   }
@@ -15,7 +15,7 @@ export class JwtRefreshGuard extends AuthGuard('jwt-refresh-token') {
       context.getHandler(),
       context.getClass(),
     ]);
-    console.info("Ini Guard Cookies")
+    console.info("Ini Guard Header")
     const isRefresh = this.reflector.getAllAndOverride<boolean>(
       IS_REFRESH_KEY,
       [context.getHandler(), context.getClass()],

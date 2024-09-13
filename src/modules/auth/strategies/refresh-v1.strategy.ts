@@ -7,9 +7,9 @@ import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/modules/user/user.service';
 
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(
+export class JwtRefreshStrategyV1 extends PassportStrategy(
   Strategy,
-  'jwt-refresh-token',
+  'jwt-refresh-token-v1',
 ) {
   constructor(
     private authService: AuthService,
@@ -22,12 +22,12 @@ export class JwtRefreshStrategy extends PassportStrategy(
       secretOrKey: configService.get('auth.secret'),
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          // Mengambil token dari cookie dengan nama 'refreshToken'
-          const refreshToken = request.cookies?.refreshToken;
-          if (!refreshToken) {
-            console.warn('No refresh token found in cookies');
+          const authHeader = request.headers['authorization'];
+          console.info("Ini Strategy Headers", authHeader);
+          if (authHeader && authHeader.startsWith('Refresh ')) {
+            return authHeader.split(' ')[1]; // Mengambil token setelah kata 'Refresh'
           }
-          return refreshToken || null;
+          return null;
         },
       ]),
     });

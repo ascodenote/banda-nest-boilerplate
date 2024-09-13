@@ -54,7 +54,7 @@ export class AuthService {
 
   async validateUser({ email, password }: LoginInputDto) {
     const user = await this.usersService.findOne(email, true);
-    console.log(user);
+
     if (!user) {
       return null;
     }
@@ -79,14 +79,20 @@ export class AuthService {
   }
 
   async login(user: any) {
-    // console.log(user);
-    const payload = { email: user.email, sub: user.id };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      name: user.name,
+      role: user.role,
+    };
 
     const token = await this.getJwtToken(payload);
+    console.log(token);
     return {
       data: payload,
       accessToken: token.accessToken,
       refreshToken: token.refreshToken,
+      expiresIn: token.expiresIn,
     };
   }
 
@@ -101,9 +107,7 @@ export class AuthService {
           infer: true,
         }),
       });
-
       userId = jwtData.confirmEmailUserId;
-      console.log(userId);
     } catch {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -114,7 +118,7 @@ export class AuthService {
     }
 
     const user = await this.usersService.findOneByID(userId);
-    console.log(user);
+
     if (!user || user?.accountStatus !== AccountStatus.Inactive) {
       throw new NotFoundException({
         status: HttpStatus.NOT_FOUND,
@@ -143,7 +147,6 @@ export class AuthService {
       infer: true,
     });
     const tokenExpires = Date.now() + ms(tokenExpiresIn);
-    console.log(tokenExpires);
 
     const hash = await this.jwtService.signAsync(
       {
@@ -205,7 +208,6 @@ export class AuthService {
   }
 
   async validateRefreshToken(sub: any): Promise<any> {
-    console.log(sub);
     const getUser = await this.usersService.findOneByID(sub);
     // console.log(getUser);
     // const isValidToken = await AuthHelpers.verify(token, getUser.hashToken);
@@ -229,10 +231,9 @@ export class AuthService {
   }
 
   async getJwtToken(user: any) {
-    console.log(this.configService.get('auth.refreshExpires'));
-    const payload = {
-      ...user,
-    };
+    console.log(this.configService.get('auth.expires'));
+    const payload = { ...user };
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.sign(payload),
       this.jwtService.sign(payload, {
@@ -240,9 +241,14 @@ export class AuthService {
         expiresIn: this.configService.get('auth.refreshExpires'),
       }),
     ]);
+
+    const expiresInString = this.configService.get('auth.expires'); // '1d'
+    const expiresInMs = ms(expiresInString); // konversi ke milidetik
+
     return {
       accessToken,
       refreshToken,
+      expiresIn: new Date().getTime() + expiresInMs, // waktu expired dalam milidetik
     };
   }
 

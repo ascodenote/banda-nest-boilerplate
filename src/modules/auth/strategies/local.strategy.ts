@@ -23,14 +23,17 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       email,
       password,
     });
+
     if (!user) {
       throw new UnauthorizedException();
     }
-
     //  Passport automatically creates a user object, based on the value we return from the validate() method, and assigns it to the Request object as req.user
     return {
       id: user.id,
-      accountStatus: user.accountStatus,
+      name: user.name,
+      email: user.email,
+      accountStatus: user.email,
+      role: user.role,
     };
   }
 }
