@@ -23,17 +23,14 @@ export class JwtRefreshStrategyV1 extends PassportStrategy(
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           const authHeader = request.headers['authorization'];
-          console.info("Ini Strategy Headers", authHeader);
-          if (authHeader && authHeader.startsWith('Refresh ')) {
-            return authHeader.split(' ')[1]; // Mengambil token setelah kata 'Refresh'
-          }
-          return null;
+          return authHeader;
         },
       ]),
     });
   }
 
   async validate(request: Request, payload: any) {
+    console.log(payload);
     if (!payload) {
       throw new BadRequestException('Invalid JWT token');
     }

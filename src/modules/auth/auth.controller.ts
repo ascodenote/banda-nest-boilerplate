@@ -8,10 +8,15 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Version
+  Version,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiOperation, ApiTags,ApiHeader,ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiHeader,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CreateUserInputDto } from '../user/dto/create-user-input.dto';
 import { LoginInputDto } from './dto/login-input.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -22,7 +27,6 @@ import { ConfirmInputDto } from './dto/confirm-input.dto';
 import { ForgetPasswordInputDto } from './dto/forget-password-input.dto';
 import { ResetPasswordInputDto } from './dto/reset-password-input.dto';
 import { JwtRefreshV1Guard } from './guards/refresh-auth-v1.guard';
-
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -63,7 +67,7 @@ export class AuthController {
 
   @Get('refresh')
   @Version('1')
-  @ApiBearerAuth('Refresh') 
+  @ApiBearerAuth('Refresh')
   @Refresh()
   @UseGuards(JwtRefreshV1Guard)
   @ApiOperation({ description: 'Refresh Token V1' })
@@ -74,6 +78,30 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   async refreshv1(@Req() req, @Res() res) {
+    const user = req.user;
+    const token = await this.authService.validateRefreshToken(user.id);
+
+    res.cookie('refreshToken', token.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+
+    return res.send({ accessToken: token.accessToken });
+  }
+
+  @Post('refresh')
+  @Version('1')
+  @Refresh()
+  @UseGuards(JwtRefreshV1Guard)
+  @ApiOperation({ description: 'Refresh Token V1' })
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Refresh Token in the format: Refresh {token}',
+    required: true,
+  })
+  @HttpCode(HttpStatus.OK)
+  async refreshv1Post(@Req() req, @Res() res) {
     const user = req.user;
     const token = await this.authService.validateRefreshToken(user.id);
 
@@ -109,8 +137,6 @@ export class AuthController {
 
     return res.send({ accessToken: token.accessToken });
   }
-
-
 
   @Post('email/confirm')
   @HttpCode(HttpStatus.OK)

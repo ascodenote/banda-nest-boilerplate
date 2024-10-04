@@ -13,7 +13,13 @@ import { MailModule } from '../mail/mail.module';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy,JwtRefreshStrategyV1],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    JwtRefreshStrategy,
+    JwtRefreshStrategyV1,
+  ],
   imports: [
     PassportModule,
     JwtModule.registerAsync({

@@ -15,7 +15,7 @@ export class JwtRefreshV1Guard extends AuthGuard('jwt-refresh-token-v1') {
       context.getHandler(),
       context.getClass(),
     ]);
-    console.info("Ini Guard Header")
+    console.info('Ini Guard Header');
     const isRefresh = this.reflector.getAllAndOverride<boolean>(
       IS_REFRESH_KEY,
       [context.getHandler(), context.getClass()],
@@ -27,7 +27,7 @@ export class JwtRefreshV1Guard extends AuthGuard('jwt-refresh-token-v1') {
       }
 
       // If isRefresh is true, activate the guard
-      if (isRefresh) { 
+      if (isRefresh) {
         return super.canActivate(context);
       }
 
